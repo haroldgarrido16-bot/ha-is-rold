@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu and Order | QCU Online Canteen</title>
+  <style>
+/* basahin niyo na lang yung mga comment para gets kung para saan yan */
+/* para sa light tapos dark mode */
+:root {
+  --navy: #1b3a6b;
+  --red: #b52a21;
+  --yellow: #f2b705;
+  --bg: #f4f6fa;
+  --card: #ffffff;
+  --text: #1c2230;
+  --muted: #55607a;
+  --border: #d5dbe8;
+}
+body.dark {
+  --bg: #141a28;
+  --card: #1e2638;
+  --text: #eef1f8;
+  --muted: #b3bbd0;
+  --border: #35405a;
+  --navy: #0e2147;
+}
+
+/* base styles naman niya to */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--navy); font-weight: 600; }
+body.dark a { color: var(--yellow); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+section { margin-bottom: 28px; }
+h1, h2, h3 { line-height: 1.25; }
+
+/* eto yung layout niya as in layout talaga */
+main { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+
+/* search box tas yung sa category siguro */
+.filters { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.field { display: flex; flex-direction: column; margin-bottom: 14px; }
+.field label { font-weight: 600; margin-bottom: 4px; }
+input, select, textarea {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+}
+
+/* food grids tas cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.card img.food { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+.card .info { padding: 12px; }
+.card .info h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.price { color: var(--red); font-weight: 700; }
+body.dark .price { color: var(--yellow); }
+.card-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* mga button to dito */
+.btn {
+  display: inline-block;
+  background: var(--red);
+  color: #fff !important;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn.secondary { background: var(--muted); }
+.btn.small { padding: 4px 10px; font-size: 0.9rem; }
+
+/* sa cart box naman */
+.cart-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: sticky; top: 10px; }
+.cart-list { list-style: none; padding: 0; margin: 0; }
+.cart-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.cart-list button {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 30px;
+}
+.cart-list .remove { color: #c0221a; }
+.total { font-size: 1.2rem; }
+.note { color: var(--muted); font-size: 0.9rem; }
+
+/* nag p-pop up na details */
+dialog { border: none; border-radius: 12px; padding: 20px; max-width: 360px; text-align: center; background: var(--card); color: var(--text); }
+dialog::backdrop { background: rgba(0,0,0,0.6); }
+dialog img { border-radius: 10px; }
+
+/* eto yung navigator bar */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--navy);
+}
+.brand { color: #fff; font-size: 1.3rem; text-decoration: none; }
+#mainNav { display: flex; gap: 6px; flex-wrap: wrap; }
+.icon-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+#menuToggle { display: none; }
+
+#mainNav a { color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; }
+#mainNav a:hover { background: rgba(255,255,255,0.15); }
+#mainNav a.active { background: var(--yellow); color: #1c2230; }
+.badge { background: var(--red); color: #fff; border-radius: 999px; padding: 0 7px; font-size: 0.8rem; }
+
+/* footer */
+.site-footer { text-align: center; padding: 16px; background: var(--navy); color: #fff; font-size: 0.9rem; }
+.site-footer p { margin: 4px 0; }
+
+/* para sa cp layout */
+@media (max-width: 768px) {
+  .two-col { grid-template-columns: 1fr; }
+  .cart-box { position: static; }
+  #menuToggle { display: block; }
+  #mainNav { display: none; width: 100%; flex-direction: column; order: 3; }
+  #mainNav.open { display: flex; }
+  .site-header { padding: 10px 14px; }
+}
+@media (max-width: 400px) {
+  main { padding: 12px; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card-actions { flex-direction: column; }
+}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">QCU Canteen</a>
+    <button id="menuToggle" class="icon-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <nav id="mainNav" aria-label="Main navigation"><a href="index.html">Home</a><a href="menu.html" class="active" aria-current="page">Menu &amp; Order</a><a href="order.html">My Order <span class="badge">1</span></a><a href="about.html">About the Team</a><a href="contact.html">Contact</a></nav>
+    <button class="icon-btn" aria-label="Toggle dark mode">🌙</button>
+  </header>
+
+  <main>
+    <h1>Menu &amp; Order</h1>
+    <div class="two-col">
+      <section>
+        <h2>Our menu</h2>
+        <div class="filters">
+          <div class="field">
+            <label for="searchInput">Search food</label>
+            <input type="search" id="searchInput" placeholder="e.g. burger">
+          </div>
+          <div class="field">
+            <label for="categoryFilter">Category</label>
+            <select id="categoryFilter">
+              <option value="All">All</option>
+              <option value="Meals">Meals</option>
+              <option value="Snacks">Snacks</option>
+              <option value="Drinks">Drinks</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card"><img class="food" src="images/adobo.jpg" alt="Chicken Adobo Meal"><div class="info"><h3>Chicken Adobo Meal</h3><p class="price">₱70.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/tapsilog.jpg" alt="Tapsilog"><div class="info"><h3>Tapsilog</h3><p class="price">₱75.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/sisig.jpg" alt="Sisig Rice"><div class="info"><h3>Sisig Rice</h3><p class="price">₱80.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/siomai.jpg" alt="Siomai Rice"><div class="info"><h3>Siomai Rice</h3><p class="price">₱50.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/spaghetti.jpg" alt="Spaghetti"><div class="info"><h3>Spaghetti</h3><p class="price">₱40.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/burger.jpg" alt="Burger"><div class="info"><h3>Burger</h3><p class="price">₱45.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/fries.jpg" alt="French Fries"><div class="info"><h3>French Fries</h3><p class="price">₱35.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/turon.jpg" alt="Turon"><div class="info"><h3>Turon</h3><p class="price">₱20.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/bananacue.jpg" alt="Banana Cue"><div class="info"><h3>Banana Cue</h3><p class="price">₱15.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/icedtea.jpg" alt="Iced Tea"><div class="info"><h3>Iced Tea</h3><p class="price">₱25.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/buko.jpg" alt="Buko Juice"><div class="info"><h3>Buko Juice</h3><p class="price">₱30.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+          <article class="card"><img class="food" src="images/water.jpg" alt="Bottled Water"><div class="info"><h3>Bottled Water</h3><p class="price">₱15.00</p><div class="card-actions"><button class="btn small secondary">Details</button><button class="btn small">Add to cart</button></div></div></article>
+        </div>
+      </section>
+
+      <aside class="cart-box">
+        <h2>Your cart</h2>
+        <ul class="cart-list">
+          <li>
+            <span>Chicken Adobo Meal</span>
+            <span>
+              <button aria-label="Decrease Chicken Adobo Meal">−</button>
+              <strong>1</strong>
+              <button aria-label="Increase Chicken Adobo Meal">+</button>
+            </span>
+            <span>₱70.00</span>
+            <button class="remove" aria-label="Remove Chicken Adobo Meal">✕</button>
+          </li>
+        </ul>
+        <p class="total">Total: <strong>₱70.00</strong></p>
+        <a class="btn" href="order.html">Checkout</a>
+        <p class="note">Your cart is saved.</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>WS101 – Web Systems and Technologies | BAIT 1C | Quezon City University</p>
+    <p>GOD IS GOOD.</p>
+  </footer>
+</body>
+</html>
